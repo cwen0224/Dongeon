@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/src/assets/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>The Crimson Sanctum - Watercolor 3D Mage Shooter</title>
+    <!-- Gothic & Retro Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=VT323&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="/Dongeon/assets/index-B2U2KPTh.js"></script>
+    <link rel="stylesheet" crossorigin href="/Dongeon/assets/index-B0r0WpSq.css">
+  </head>
+  <body>
+    <div id="game-container">
+      <!-- 3D WebGL Canvas is injected here by Three.js -->
+      
+      <!-- CRT Screen Filter -->
+      <div class="crt-overlay"></div>
+      
+      <!-- Screen Flashes -->
+      <div id="damage-flash" class="flash"></div>
+      <div id="heal-flash" class="flash"></div>
+      <div id="lightning-flash" class="flash"></div>
+
+      <!-- Crosshair -->
+      <div id="crosshair">+</div>
+
+      <div id="weapon-overlay">
+        <img id="mage-hands" src="/Dongeon/assets/hands_idle.png" alt="Mage Hands" />
+      </div>
+
+      <!-- Scrolling Combat Log -->
+      <div id="combat-log"></div>
+
+      <!-- Bottom HUD Dashboard -->
+      <div id="hud-dashboard">
+        <!-- Health Section -->
+        <div class="hud-section health-section">
+          <div class="hud-label">HEALTH</div>
+          <div class="bar-container">
+            <div id="health-bar" class="hud-bar health-bar" style="width: 100%;"></div>
+            <div id="health-text" class="bar-text">100 / 100</div>
+          </div>
+          <!-- Animated Face Portrait -->
+          <div class="portrait-container">
+            <div id="portrait" class="portrait-normal"></div>
+          </div>
+        </div>
+
+        <!-- Spell / Center Section -->
+        <div class="hud-section spell-section">
+          <div class="hud-label">ACTIVE SPELL</div>
+          <div class="spell-slot-container">
+            <div id="prev-spell-btn" class="spell-arrow">&lt;</div>
+            <div class="spell-slot">
+              <div id="spell-icon" class="spell-icon fireball-icon"></div>
+              <div id="spell-name">FIREBALL</div>
+              <div id="spell-cost">Cost: 15 MP</div>
+            </div>
+            <div id="next-spell-btn" class="spell-arrow">&gt;</div>
+          </div>
+          <div class="controls-hint">Q / E / MouseWheel to swap | Click to cast</div>
+        </div>
+
+        <!-- Mana Section -->
+        <div class="hud-section mana-section">
+          <div class="hud-label">MANA</div>
+          <div class="bar-container">
+            <div id="mana-bar" class="hud-bar mana-bar" style="width: 100%;"></div>
+            <div id="mana-text" class="bar-text">100 / 100</div>
+          </div>
+          <div class="mana-crystal-container">
+            <span class="hud-label">KEYS: </span>
+            <div id="key-indicator" class="key-indicator no-key">🔑 NONE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screens (Overlay UI) -->
+      <!-- Start / Instructions Screen -->
+      <div id="start-screen" class="overlay-screen active">
+        <div class="panel">
+          <h1 class="game-title">The Crimson Sanctum</h1>
+          <p class="game-subtitle">A Watercolor 3D Mage Shooter</p>
+          
+          <div class="instructions">
+            <h3>HOW TO PLAY:</h3>
+            <p><strong>W, A, S, D</strong> - Move around the dungeon</p>
+            <p><strong>Mouse Look</strong> - Look around (locks cursor)</p>
+            <p><strong>Left Click</strong> - Cast selected spell</p>
+            <p><strong>Q, E / Scroll Wheel</strong> - Change Active Spells</p>
+            <p><strong>1, 2, 3, 4</strong> - Direct Spell Selection</p>
+            <p><strong>ESC</strong> - Pause & Release Cursor</p>
+          </div>
+
+          <div class="spell-guide">
+            <h3>YOUR SPELLBOOK:</h3>
+            <div class="spell-grid">
+              <div class="spell-card">
+                <span class="spell-num">1</span>
+                <strong>FIREBALL</strong> (15 MP)
+                <span>Projective explosion. Deals AoE damage.</span>
+              </div>
+              <div class="spell-card">
+                <span class="spell-num">2</span>
+                <strong>REGENERATE</strong> (25 MP)
+                <span>Heals 40 Health over 2 seconds.</span>
+              </div>
+              <div class="spell-card">
+                <span class="spell-num">3</span>
+                <strong>FROST SHARD</strong> (10 MP)
+                <span>Slows enemies down. Low damage.</span>
+              </div>
+              <div class="spell-card">
+                <span class="spell-num">4</span>
+                <strong>LIGHTNING</strong> (30 MP)
+                <span>Hitscan high-damage instant zap.</span>
+              </div>
+            </div>
+          </div>
+
+          <button id="start-btn" class="retro-btn">ENTER SANCTUM</button>
+        </div>
+      </div>
+
+      <!-- Pause Screen -->
+      <div id="pause-screen" class="overlay-screen">
+        <div class="panel">
+          <h1 class="paused-title">GAME PAUSED</h1>
+          <p>Click below to resume your quest.</p>
+          <button id="resume-btn" class="retro-btn">RESUME GAME</button>
+        </div>
+      </div>
+
+      <!-- Death Screen -->
+      <div id="death-screen" class="overlay-screen">
+        <div class="panel">
+          <h1 class="death-title">YOU PERISHED</h1>
+          <p>Your bones join the dust of the sanctum...</p>
+          <div class="stats-box">
+            <p>Enemies Defeated: <span id="death-kills">0</span></p>
+          </div>
+          <button id="restart-btn" class="retro-btn">TRY AGAIN</button>
+        </div>
+      </div>
+
+      <!-- Win Screen -->
+      <div id="win-screen" class="overlay-screen">
+        <div class="panel">
+          <h1 class="win-title">SANCTUM PURIFIED</h1>
+          <p>The dark portal is closed. You have survived the Crimson Sanctum!</p>
+          <div class="stats-box">
+            <p>Enemies Defeated: <span id="win-kills">0</span></p>
+            <p>Mana Remaining: <span id="win-mana">0</span></p>
+          </div>
+          <button id="win-restart-btn" class="retro-btn">PLAY AGAIN</button>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>
