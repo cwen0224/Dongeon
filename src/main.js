@@ -5,6 +5,18 @@ import { Projectile, castLightning } from './engine/Spells.js';
 import { Enemy } from './engine/Enemy.js';
 import { Sound } from './engine/Sound.js';
 
+// Global Error Listener for debugging
+window.addEventListener('error', (e) => {
+  console.error(e);
+  const logEl = document.getElementById('combat-log');
+  if (logEl) {
+    const entry = document.createElement('div');
+    entry.className = 'log-entry log-damage';
+    entry.innerText = `> ERR: ${e.message} at ${e.filename}:${e.lineno}`;
+    logEl.appendChild(entry);
+  }
+});
+
 // Game State Variables
 let scene, camera, renderer;
 let player, map;
@@ -192,7 +204,7 @@ function castPlayerSpell() {
   player.updateHUD();
 
   // Play hands anim
-  mageHands.src = `/assets/hands_cast.png`;
+  mageHands.src = `assets/hands_cast.png`;
   mageHands.classList.add('hands-cast-anim');
   
   setTimeout(() => {
@@ -217,7 +229,7 @@ function castPlayerSpell() {
   } 
   else if (spell.name === 'REGENERATE') {
     // Healing spell
-    mageHands.src = `/assets/hands_heal.png`;
+    mageHands.src = `assets/hands_heal.png`;
     player.heal(40);
     addLog("CAST REGENERATE (+40 HP)", "log-heal");
     player.castCooldown = 0.8; // heal animation lock
@@ -237,7 +249,7 @@ function castPlayerSpell() {
 
 // Dynamically sets standard idle hands image
 function updateMageHandsImage() {
-  mageHands.src = `/src/assets/hands_idle.png`;
+  mageHands.src = `assets/hands_idle.png`;
 }
 
 function resetGame() {

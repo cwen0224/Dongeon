@@ -80,7 +80,7 @@ export class Enemy {
 
   setupStats() {
     if (this.type === 'skeleton') {
-      this.spriteUrl = '/assets/skeleton.png';
+      this.spriteUrl = 'assets/skeleton.png';
       this.maxHealth = 45;
       this.health = 45;
       this.speed = 1.6;
@@ -92,7 +92,7 @@ export class Enemy {
       this.scoreValue = 100;
     } 
     else if (this.type === 'eye') {
-      this.spriteUrl = '/assets/eye.png';
+      this.spriteUrl = 'assets/eye.png';
       this.maxHealth = 35;
       this.health = 35;
       this.speed = 1.1;
@@ -104,7 +104,7 @@ export class Enemy {
       this.scoreValue = 150;
     } 
     else if (this.type === 'boss') {
-      this.spriteUrl = '/assets/boss.png';
+      this.spriteUrl = 'assets/boss.png';
       this.maxHealth = 200;
       this.health = 200;
       this.speed = 1.3;
