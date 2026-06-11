@@ -41,6 +41,44 @@ let enemyProjectiles = [];
 let particles = [];
 let gameState = 'start'; // 'start', 'playing', 'paused', 'dead', 'win'
 
+// Hands chroma-key Data URL cache
+const transparentHands = {
+  idle: '',
+  cast: '',
+  heal: ''
+};
+
+// Chroma-key helper for hands overlay images
+function loadAndChromaKeyImage(url, callback) {
+  const image = new Image();
+  image.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0);
+
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imgData.data;
+
+    // Filter out black/near-black pixels using color distance
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      
+      const distance = Math.sqrt(r * r + g * g + b * b);
+      if (distance < 50) {
+        data[i + 3] = 0; // Set alpha to transparent
+      }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+    callback(canvas.toDataURL());
+  };
+  image.src = url;
+}
+
 // HTML UI Elements
 const startScreen = document.getElementById('start-screen');
 const pauseScreen = document.getElementById('pause-screen');
@@ -99,6 +137,19 @@ function initGame() {
 
   // 5. Spawn Enemies based on Grid
   spawnEnemies();
+
+  // Pre-process hands images to dynamically remove black backgrounds
+  const baseUrl = import.meta.env.BASE_URL;
+  loadAndChromaKeyImage(`${baseUrl}assets/hands_idle.png`, (dataUrl) => {
+    transparentHands.idle = dataUrl;
+    mageHands.src = dataUrl; // set transparent idle hands
+  });
+  loadAndChromaKeyImage(`${baseUrl}assets/hands_cast.png`, (dataUrl) => {
+    transparentHands.cast = dataUrl;
+  });
+  loadAndChromaKeyImage(`${baseUrl}assets/hands_heal.png`, (dataUrl) => {
+    transparentHands.heal = dataUrl;
+  });
 
   // Initialize UI displays
   player.updateHUD();
@@ -226,7 +277,7 @@ function castPlayerSpell() {
 
   // Play hands anim
   const baseUrl = import.meta.env.BASE_URL;
-  mageHands.src = `${baseUrl}assets/hands_cast.png`;
+  mageHands.src = transparentHands.cast || `${baseUrl}assets/hands_cast.png`;
   mageHands.classList.add('hands-cast-anim');
   
   setTimeout(() => {
@@ -251,7 +302,7 @@ function castPlayerSpell() {
   } 
   else if (spell.name === 'REGENERATE') {
     // Healing spell
-    mageHands.src = `${baseUrl}assets/hands_heal.png`;
+    mageHands.src = transparentHands.heal || `${baseUrl}assets/hands_heal.png`;
     player.heal(40);
     addLog("CAST REGENERATE (+40 HP)", "log-heal");
     player.castCooldown = 0.8; // heal animation lock
@@ -272,7 +323,7 @@ function castPlayerSpell() {
 // Dynamically sets standard idle hands image
 function updateMageHandsImage() {
   const baseUrl = import.meta.env.BASE_URL;
-  mageHands.src = `${baseUrl}assets/hands_idle.png`;
+  mageHands.src = transparentHands.idle || `${baseUrl}assets/hands_idle.png`;
 }
 
 function resetGame() {

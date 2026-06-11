@@ -137,8 +137,6 @@ canvas {
   height: 100%;
   max-width: 100%;
   object-fit: contain;
-  /* Filter out pure black color key if generated sprites aren't perfectly keyed */
-  mix-blend-mode: screen;
 }
 
 /* Hands bobbing effect when player walks */

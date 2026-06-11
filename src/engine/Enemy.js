@@ -17,13 +17,14 @@ export function loadChromaKeyTexture(url, colorKey = { r: 15, g: 15, b: 15 }) {
     const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imgData.data;
 
-    // Filter out black/near-black pixels
+    // Filter out black/near-black pixels using color distance (handles gradients/noise)
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
       
-      if (r <= colorKey.r && g <= colorKey.g && b <= colorKey.b) {
+      const distance = Math.sqrt(r * r + g * g + b * b);
+      if (distance < 50) {
         data[i + 3] = 0; // Set alpha to transparent
       }
     }
