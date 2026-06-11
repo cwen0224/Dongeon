@@ -51,8 +51,8 @@ function initGame() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b080a);
   
-  // Dense retro exponential fog
-  scene.fog = new THREE.FogExp2(0x0b080a, 0.25);
+  // Spooky but playable retro fog
+  scene.fog = new THREE.FogExp2(0x0b080a, 0.085);
 
   camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 30.0);
 
@@ -68,9 +68,15 @@ function initGame() {
   const container = document.getElementById('game-container');
   container.insertBefore(renderer.domElement, container.firstChild);
 
-  // 3. Add ambient dungeon lighting
-  const ambientLight = new THREE.AmbientLight(0x1a121d, 0.4);
+  // 3. Add ambient dungeon lighting (brighter so watercolor textures are visible)
+  const ambientLight = new THREE.AmbientLight(0x403545, 0.85);
   scene.add(ambientLight);
+
+  // Add a player headlight point light so walls directly in front of the player are always illuminated (classic Doom/Daggerfall effect)
+  const headlight = new THREE.PointLight(0xfff5e6, 0.7, 5.0);
+  headlight.position.set(0, 0, 0); // centered at camera
+  camera.add(headlight);
+  scene.add(camera); // scene must contain camera for children lights to render
 
   // 4. Initialize Map & Player
   map = new Map(scene);
@@ -204,7 +210,8 @@ function castPlayerSpell() {
   player.updateHUD();
 
   // Play hands anim
-  mageHands.src = `assets/hands_cast.png`;
+  const baseUrl = import.meta.env.BASE_URL;
+  mageHands.src = `${baseUrl}assets/hands_cast.png`;
   mageHands.classList.add('hands-cast-anim');
   
   setTimeout(() => {
@@ -229,7 +236,7 @@ function castPlayerSpell() {
   } 
   else if (spell.name === 'REGENERATE') {
     // Healing spell
-    mageHands.src = `assets/hands_heal.png`;
+    mageHands.src = `${baseUrl}assets/hands_heal.png`;
     player.heal(40);
     addLog("CAST REGENERATE (+40 HP)", "log-heal");
     player.castCooldown = 0.8; // heal animation lock
@@ -249,7 +256,8 @@ function castPlayerSpell() {
 
 // Dynamically sets standard idle hands image
 function updateMageHandsImage() {
-  mageHands.src = `assets/hands_idle.png`;
+  const baseUrl = import.meta.env.BASE_URL;
+  mageHands.src = `${baseUrl}assets/hands_idle.png`;
 }
 
 function resetGame() {

@@ -38,10 +38,11 @@ export class Map {
     this.exitPortal = null;
 
     // Load textures
+    const baseUrl = import.meta.env.BASE_URL;
     const textureLoader = new THREE.TextureLoader();
-    this.wallTex = textureLoader.load('assets/wall.png');
-    this.floorTex = textureLoader.load('assets/floor.png');
-    this.ceilTex = textureLoader.load('assets/ceiling.png');
+    this.wallTex = textureLoader.load(`${baseUrl}assets/wall.png`);
+    this.floorTex = textureLoader.load(`${baseUrl}assets/floor.png`);
+    this.ceilTex = textureLoader.load(`${baseUrl}assets/ceiling.png`);
 
     // Configure retro pixel look
     [this.wallTex, this.floorTex, this.ceilTex].forEach(tex => {
