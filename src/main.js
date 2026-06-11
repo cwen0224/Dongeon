@@ -17,6 +17,21 @@ window.addEventListener('error', (e) => {
   }
 });
 
+// Override console.error to intercept texture 404s and print them to the screen
+const originalConsoleError = console.error;
+console.error = function(...args) {
+  originalConsoleError.apply(console, args);
+  const logEl = document.getElementById('combat-log');
+  if (logEl) {
+    const entry = document.createElement('div');
+    entry.className = 'log-entry log-damage';
+    // Format message to keep it clean and short
+    const msg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    entry.innerText = `> CONSOLE_ERR: ${msg.substring(0, 80)}`;
+    logEl.appendChild(entry);
+  }
+};
+
 // Game State Variables
 let scene, camera, renderer;
 let player, map;
