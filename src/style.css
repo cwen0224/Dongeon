@@ -127,7 +127,7 @@ canvas {
   pointer-events: none;
   width: 480px;
   height: 320px;
-  display: flex;
+  display: none; /* hidden by user request */
   justify-content: center;
   align-items: flex-end;
   transform-origin: bottom center;
